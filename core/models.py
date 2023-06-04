@@ -4,7 +4,7 @@ from users.models import User# Create your models here.
 class Department(models.Model):
     name = models.CharField(max_length=50)
     function = models.CharField(max_length=255)
-    contact = models.EmailField(max_length=50)
+    contact = models.EmailField(max_length=50, unique=True)
     location = models.CharField(max_length=50)
 
     def __str__(self):
@@ -17,7 +17,8 @@ class Employee(models.Model):
     head = models.BooleanField()
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     function = models.CharField(max_length=50)
-    finger_print = models.ImageField(upload_to ='finger_prints/', null=True)
+    finger_print = models.CharField(max_length=150)
+    code = models.CharField(max_length=20, unique=True)
     phone = models.CharField(max_length=11)
 
     def __str__(self):
@@ -25,11 +26,10 @@ class Employee(models.Model):
 
 
 class CheckIn(models.Model):
-    date = models.DateField()
+    date = models.DateTimeField()
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.date, self.employee
+   
 
 class Message(models.Model):
     MESSAGE_TYPE_CHOICES = [

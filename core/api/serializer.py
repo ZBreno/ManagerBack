@@ -1,5 +1,6 @@
 from core.models import Department, Employee, CheckIn, Message
 from rest_framework import serializers
+from datetime import datetime
 
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -8,9 +9,30 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
 class EmployeeSerializer(serializers.ModelSerializer):
     department = serializers.SlugRelatedField(queryset=Department.objects.all(),slug_field='id')
+    checkin = serializers.SerializerMethodField('status')
     class Meta:
         model = Employee
         fields = '__all__'
+
+    def status(self, instance):
+
+        data_atual = datetime.now().date()
+        checked = False
+        employee = instance.id
+  
+        try:
+            checkin = CheckIn.objects.filter(employee=employee).latest("id")
+            data_checkin = checkin.date.date()
+            data_checkinSerialiaze = checkin.date
+       
+            if(data_atual == data_checkin):
+                checked = True
+
+            return {'checkin': checked, 'date': data_checkinSerialiaze}
+
+        
+        except:
+            return {'checkin': checked}
 
 class CheckInSerializer(serializers.ModelSerializer):
     class Meta:
