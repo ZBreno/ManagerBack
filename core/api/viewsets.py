@@ -10,7 +10,8 @@ class DepartmentViewSet(ModelViewSet):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
     permission_classes = [permissions.IsAuthenticated]
-
+    
+    
 class EmployeeViewSet(ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
@@ -32,7 +33,6 @@ class EmployeeViewSet(ModelViewSet):
 
     @action(methods=['get'], detail=False, url_path='percent')
     def percent(self, request, *args, **kwargs):
-        last_five = []
         queryset = Employee.objects.all()
         qtd_employee = queryset.count()
         data_atual = datetime.now().date()
@@ -44,11 +44,14 @@ class EmployeeViewSet(ModelViewSet):
 
 
 class CheckInViewSet(generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView, GenericViewSet):
+    
     queryset = CheckIn.objects.all()
     serializer_class = CheckInSerializer
     permission_classes = [permissions.IsAuthenticated]
    
-    
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     self.add_tags(['checkin']) 
 
 class MessageViewSet(ModelViewSet):
     queryset = Message.objects.all()

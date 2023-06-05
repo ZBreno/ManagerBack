@@ -57,6 +57,8 @@ INSTALLED_APPS = [
     'users',
     'rest_framework_simplejwt',
     'rest_framework',
+    'drf_spectacular',
+    
 ]
 
 MIDDLEWARE = [
@@ -75,8 +77,18 @@ REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    
 
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Management Employeer',
+    'DESCRIPTION': '',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+   
 }
 
 

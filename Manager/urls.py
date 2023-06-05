@@ -21,6 +21,7 @@ from django.conf.urls import include
 from django.conf import settings
 from django.conf.urls.static import static
 from core.api.viewsets import CheckInViewSet, DepartmentViewSet, MessageViewSet, EmployeeViewSet
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 
 from rest_framework_simplejwt.views import (
@@ -36,12 +37,21 @@ router.register('message', MessageViewSet)
 router.register('employee', EmployeeViewSet)
 
 
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include(router.urls)),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path("api/schema/", SpectacularAPIView.as_view(), name="api-schema"),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(url_name="api-schema"),
+        name="api-docs",
+    ),
+    # path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
