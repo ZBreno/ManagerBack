@@ -31,6 +31,24 @@ class EmployeeViewSet(ModelViewSet):
         return Response(last_five)
     
 
+    @action(methods=['get'], detail=False, url_path='un_checked')
+    def un_checked(self, request, *args, **kwargs):
+        
+        unchecked_employees = []
+    
+        for employee in Employee.objects.all():
+
+            employee = EmployeeSerializer(employee).data
+            print(not employee)
+
+            if(not bool(employee['status']['checkin'])):
+                print(employee)
+                unchecked_employees.append(employee)
+        
+
+        return Response(unchecked_employees)
+    
+
     @action(methods=['get'], detail=False, url_path='percent')
     def percent(self, request, *args, **kwargs):
         queryset = Employee.objects.all()

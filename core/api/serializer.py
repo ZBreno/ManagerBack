@@ -9,12 +9,15 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
 class EmployeeSerializer(serializers.ModelSerializer):
     department = serializers.SlugRelatedField(queryset=Department.objects.all(),slug_field='id')
-    checkin = serializers.SerializerMethodField('status')
+    status = serializers.SerializerMethodField('status_check_in')
     class Meta:
         model = Employee
         fields = '__all__'
 
-    def status(self, instance):
+    
+    
+    
+    def status_check_in(self, instance):
 
         data_atual = datetime.now().date()
         checked = False
@@ -27,9 +30,9 @@ class EmployeeSerializer(serializers.ModelSerializer):
        
             if(data_atual == data_checkin):
                 checked = True
-
-            return {'checkin': checked, 'date': data_checkinSerialiaze}
-
+                return {'checkin': checked, 'date': data_checkinSerialiaze}
+            
+            return {'checkin': checked}
         
         except:
             return {'checkin': checked}
