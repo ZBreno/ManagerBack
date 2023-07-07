@@ -9,13 +9,13 @@ from datetime import datetime
 class DepartmentViewSet(ModelViewSet):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     
     
 class EmployeeViewSet(ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
    
 
     @action(methods=['get'], detail=False, url_path='last_five')
@@ -65,7 +65,7 @@ class CheckInViewSet(generics.CreateAPIView, generics.ListAPIView, generics.Retr
     
     queryset = CheckIn.objects.all()
     serializer_class = CheckInSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
    
     # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
@@ -74,7 +74,7 @@ class CheckInViewSet(generics.CreateAPIView, generics.ListAPIView, generics.Retr
 class MessageViewSet(ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     @action(methods=['get'], detail=False, url_path='message_unread')
     def count_message_read(self, request):

@@ -42,11 +42,11 @@ class Message(models.Model):
     ]
 
     title = models.CharField(max_length=100)
-    attachment = models.FileField(upload_to ='attachment/', null=True)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
-    manager = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    attachment = models.FileField(upload_to ='attachment/', null=True, blank=True)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank=True)
+    manager = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     read = models.BooleanField()
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True)
     message_type = models.CharField(choices=MESSAGE_TYPE_CHOICES,max_length=50)
     description = models.CharField(max_length=255)
 

@@ -1,7 +1,7 @@
 from core.models import Department, Employee, CheckIn, Message
 from rest_framework import serializers
 from datetime import datetime
-
+from users.api.serializer import UserSerializer
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
@@ -43,6 +43,11 @@ class CheckInSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class MessageSerializer(serializers.ModelSerializer):
+    department = DepartmentSerializer(read_only=True)
+    manager = UserSerializer(read_only=True)
+    
+    
+    
     class Meta:
         model = Message
-        fields = '__all__'
+        fields = ['id','title', 'department', 'attachment', 'manager', 'read', 'message_type', 'description']

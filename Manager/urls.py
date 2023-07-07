@@ -21,6 +21,7 @@ from django.conf.urls import include
 from django.conf import settings
 from django.conf.urls.static import static
 from core.api.viewsets import CheckInViewSet, DepartmentViewSet, MessageViewSet, EmployeeViewSet
+from users.api.viewsets import UserViewSet
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 
@@ -35,6 +36,7 @@ router.register('checkIn', CheckInViewSet)
 router.register('department', DepartmentViewSet)
 router.register('message', MessageViewSet)
 router.register('employee', EmployeeViewSet)
+router.register('users', UserViewSet)
 
 
 

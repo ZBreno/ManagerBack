@@ -18,6 +18,9 @@ class User(AbstractUser):
 
     objects = UserManager()
 
+    def __str__(self):
+        return self.email
+
     def get_absolute_url(self) -> str:
     
         return reverse("users:detail", kwargs={"pk": self.id})
