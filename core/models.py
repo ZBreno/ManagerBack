@@ -3,7 +3,7 @@ from users.models import User# Create your models here.
 
 class Department(models.Model):
     name = models.CharField(max_length=50)
-    function = models.CharField(max_length=255)
+    assignment = models.CharField(max_length=255)
     contact = models.EmailField(max_length=50, unique=True)
     location = models.CharField(max_length=50)
 
@@ -11,13 +11,19 @@ class Department(models.Model):
         return self.name
     
 class Employee(models.Model):
+
+    HEAD_CHOICES = [
+        ("SIM", "Sim"),
+        ("NAO", "Não"),
+    ]
+    
     name = models.CharField(max_length=50)
     email = models.EmailField(max_length=100)
     birth_date = models.DateField()
-    head = models.BooleanField()
+    head = models.CharField(choices=HEAD_CHOICES,max_length=50)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    function = models.CharField(max_length=50)
-    finger_print = models.CharField(max_length=150)
+    assignment = models.CharField(max_length=50)
+    finger_print = models.CharField(max_length=150, null=True, blank=True)
     code = models.CharField(max_length=20, unique=True)
     phone = models.CharField(max_length=11)
 
