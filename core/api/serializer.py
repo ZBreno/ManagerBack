@@ -8,7 +8,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class EmployeeSerializer(serializers.ModelSerializer):
-    department = serializers.SlugRelatedField(queryset=Department.objects.all(),slug_field='id')
+    department = DepartmentSerializer(read_only=True)
     status = serializers.SerializerMethodField('status_check_in')
     class Meta:
         model = Employee

@@ -13,8 +13,8 @@ class User(AbstractUser):
     email = EmailField(_("email address"), unique=True, max_length=50)
     profile = ImageField(upload_to='profile/')
     
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['']
 
     objects = UserManager()
 
