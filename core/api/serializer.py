@@ -2,20 +2,18 @@ from core.models import Department, Employee, CheckIn, Message
 from rest_framework import serializers
 from datetime import datetime
 from users.api.serializer import UserSerializer
+
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
-        fields = '__all__'
+        fields = ['id','name','assignment','contact','location']
 
 class EmployeeSerializer(serializers.ModelSerializer):
     department = DepartmentSerializer(read_only=True)
     status = serializers.SerializerMethodField('status_check_in')
     class Meta:
         model = Employee
-        fields = '__all__'
-
-    
-    
+        fields = ['id','name', 'email','birth_date','head','department','assignment','finger_print','code','phone', 'status']
     
     def status_check_in(self, instance):
 
@@ -45,9 +43,8 @@ class CheckInSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     department = DepartmentSerializer(read_only=True)
     manager = UserSerializer(read_only=True)
-    
-    
+    employee = EmployeeSerializer(read_only=True)
     
     class Meta:
         model = Message
-        fields = ['id','title', 'department', 'attachment', 'manager', 'read', 'message_type', 'description']
+        fields = ['id','title', 'department', 'attachment', 'manager', 'read', 'message_type', 'description','employee']
