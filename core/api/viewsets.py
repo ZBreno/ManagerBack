@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from core.models import Department, CheckIn, Employee, Message
 from core.api.serializer import DepartmentSerializer, EmployeeSerializer, MessageSerializer, CheckInSerializer
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from django.db.models import Q
 from core.api.generate_code import code
 from users.models import User
@@ -95,7 +95,7 @@ class EmployeeViewSet(ModelViewSet):
         percent = (checkin.count() / qtd_employee) * 100
 
         print('quanditdade de funcionario', qtd_employee, 'quanditdade de checkin', checkin.count())
-        return Response({'percent' : f'{int(percent)}%'})
+        return Response({'percent' : int(percent)})
 
     @action(methods=['get'], detail=True, url_path='messages')
     def messages(self,request, *args, **kwargs):
@@ -121,6 +121,17 @@ class EmployeeViewSet(ModelViewSet):
                 checks.append(checkin)
         serializer = CheckInSerializer(checks, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+    @action(methods=['get'], detail=False, url_path='employee_code/(?P<code>[^/.]+)')
+    def employee_by_code(self, request, *args, **kwargs):
+        try:
+            employee = Employee.objects.get(code=self.kwargs['code'])
+            serializer = EmployeeSerializer(employee)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Employee.DoesNotExist:
+            return Response({"Error": "Employee not found."}, status=status.HTTP_400_BAD_REQUEST)
+        
 
 class CheckInViewSet(generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView, GenericViewSet):
     
@@ -132,7 +143,7 @@ class CheckInViewSet(generics.CreateAPIView, generics.ListAPIView, generics.Retr
     def week(self,request, *args, **kwargs):
         dt = datetime.today()
         week = [dt + timedelta(days=i) for i in range(0 - dt.weekday(), 7 - dt.weekday())]
-
+        dias = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-Feira", "Sábado"]
         results = []
         for day in week:
             number = 0
@@ -140,7 +151,7 @@ class CheckInViewSet(generics.CreateAPIView, generics.ListAPIView, generics.Retr
             for checkin in checkins:
                 if checkin.date.date() == day.date():
                     number += 1
-            results.append(number)
+            results.append({'name': dias[day.weekday()], 'checkIns': number})
 
         return Response(results, status=status.HTTP_200_OK)
    
@@ -170,6 +181,7 @@ class MessageViewSet(generics.CreateAPIView, generics.ListAPIView, generics.Retr
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
+        print(request.data['attachment'])
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         if 'department' in request.data:

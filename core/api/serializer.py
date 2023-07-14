@@ -1,9 +1,10 @@
 from core.models import Department, Employee, CheckIn, Message
 from rest_framework import serializers
-from datetime import datetime
+from datetime import datetime, timedelta
 from users.api.serializer import UserSerializer
 
 class DepartmentSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
     class Meta:
         model = Department
         fields = ['id','name','assignment','contact','location']
@@ -23,12 +24,15 @@ class EmployeeSerializer(serializers.ModelSerializer):
   
         try:
             checkin = CheckIn.objects.filter(employee=employee).latest("id")
+            dateBR = checkin.date - timedelta(hours=3)
             data_checkin = checkin.date.date()
-            data_checkinSerialiaze = checkin.date
+            data_checkinSerialiaze = dateBR.strftime("%d/%m/%y às %H:%M:%S") 
+           
+           
        
             if(data_atual == data_checkin):
                 checked = True
-                return {'checkin': checked, 'date': data_checkinSerialiaze}
+                return {'checkin': checked, 'date': data_checkinSerialiaze }
             
             return {'checkin': checked}
         
