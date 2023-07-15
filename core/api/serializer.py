@@ -5,9 +5,17 @@ from users.api.serializer import UserSerializer
 
 class DepartmentSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
+    head = serializers.SerializerMethodField()
     class Meta:
         model = Department
-        fields = ['id','name','assignment','contact','location']
+        fields = ['id','name','assignment','contact','location','head']
+
+    def get_head(self, instance):
+        try:
+            head = instance.employees.get(head="SIM")
+            return f"{head.name} | id: {head.id}"
+        except Employee.DoesNotExist:
+            return None
 
 class EmployeeSerializer(serializers.ModelSerializer):
     department = DepartmentSerializer(read_only=True)

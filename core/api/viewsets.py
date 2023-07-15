@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from core.models import Department, CheckIn, Employee, Message
 from core.api.serializer import DepartmentSerializer, EmployeeSerializer, MessageSerializer, CheckInSerializer
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from django.db.models import Q
 from core.api.generate_code import code
 from users.models import User
@@ -12,7 +12,31 @@ from users.models import User
 class DepartmentViewSet(ModelViewSet):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        name = request.query_params.get('name') or ""
+        queryset = Department.objects.filter(user=request.user, name__icontains=name)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        
+        employee = Employee.objects.get(id=request.data['head'])
+        employee.head= "SIM"
+
+        return Response(serializer.data)
     
     
 class EmployeeViewSet(ModelViewSet):
@@ -21,11 +45,12 @@ class EmployeeViewSet(ModelViewSet):
     permission_classes = [permissions.AllowAny]
 
     def list(self, request, *args, **kwargs):
+        name = request.query_params.get('name') or ""
         try:
             department = Department.objects.get(id=request.query_params.get('department'))
-            queryset = Employee.objects.filter(department=department)
+            queryset = Employee.objects.filter(department=department, name__icontains=name)
         except Department.DoesNotExist:
-            queryset = Employee.objects.all()
+            queryset = Employee.objects.filter(name__icontains=name)
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -95,7 +120,7 @@ class EmployeeViewSet(ModelViewSet):
         percent = (checkin.count() / qtd_employee) * 100
 
         print('quanditdade de funcionario', qtd_employee, 'quanditdade de checkin', checkin.count())
-        return Response({'percent' : int(percent)})
+        return Response({'percent' : f'{int(percent)}%'})
 
     @action(methods=['get'], detail=True, url_path='messages')
     def messages(self,request, *args, **kwargs):
@@ -121,17 +146,6 @@ class EmployeeViewSet(ModelViewSet):
                 checks.append(checkin)
         serializer = CheckInSerializer(checks, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-
-    @action(methods=['get'], detail=False, url_path='employee_code/(?P<code>[^/.]+)')
-    def employee_by_code(self, request, *args, **kwargs):
-        try:
-            employee = Employee.objects.get(code=self.kwargs['code'])
-            serializer = EmployeeSerializer(employee)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Employee.DoesNotExist:
-            return Response({"Error": "Employee not found."}, status=status.HTTP_400_BAD_REQUEST)
-        
 
 class CheckInViewSet(generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView, GenericViewSet):
     
@@ -143,7 +157,7 @@ class CheckInViewSet(generics.CreateAPIView, generics.ListAPIView, generics.Retr
     def week(self,request, *args, **kwargs):
         dt = datetime.today()
         week = [dt + timedelta(days=i) for i in range(0 - dt.weekday(), 7 - dt.weekday())]
-        dias = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-Feira", "Sábado"]
+
         results = []
         for day in week:
             number = 0
@@ -151,7 +165,7 @@ class CheckInViewSet(generics.CreateAPIView, generics.ListAPIView, generics.Retr
             for checkin in checkins:
                 if checkin.date.date() == day.date():
                     number += 1
-            results.append({'name': dias[day.weekday()], 'checkIns': number})
+            results.append(number)
 
         return Response(results, status=status.HTTP_200_OK)
    
@@ -166,11 +180,13 @@ class MessageViewSet(generics.CreateAPIView, generics.ListAPIView, generics.Retr
 
     def list(self, request, *args, **kwargs):
         type = request.query_params.get('type')
-        print(type)
+        name = request.query_params.get('name') or ""
+        print(name)
+
         if type:
-            queryset = Message.objects.filter(message_type=type)
+            queryset = Message.objects.filter(Q(employee__name__icontains=name) | Q(manager__name__icontains=name), message_type=type)
         else:
-            queryset = Message.objects.all()
+            queryset = Message.objects.filter(Q(employee__name__icontains=name) | Q(manager__name__icontains=name))
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -181,7 +197,6 @@ class MessageViewSet(generics.CreateAPIView, generics.ListAPIView, generics.Retr
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
-        print(request.data['attachment'])
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         if 'department' in request.data:
@@ -207,3 +222,7 @@ class MessageViewSet(generics.CreateAPIView, generics.ListAPIView, generics.Retr
         serializer = self.get_serializer(instance)
         
         return Response(serializer.data)
+
+    @action(methods=['get'], detail=False, url_path='news')
+    def news(self, request):
+        return Response(Message.objects.filter(read=False).count(), status=status.HTTP_200_OK)
