@@ -8,7 +8,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
     head = serializers.SerializerMethodField()
     class Meta:
         model = Department
-        fields = ['id','name','assignment','contact','location','head']
+        fields = ['id','name','assignment','contact','location','head','user']
 
     def get_head(self, instance):
         try:

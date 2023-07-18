@@ -13,6 +13,14 @@ class DepartmentViewSet(ModelViewSet):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
     permission_classes = [permissions.IsAuthenticated]
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.validated_data['']
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def list(self, request, *args, **kwargs):
         name = request.query_params.get('name') or ""
@@ -144,8 +152,12 @@ class EmployeeViewSet(ModelViewSet):
 
             if date.date() == today.date() or date.date() == yesterday.date():
                 checks.append(checkin)
-        serializer = CheckInSerializer(checks, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+                
+        data = []
+        for checkin in checks:
+            data.append({"data" : checkin.date.date().strftime('%d/%m/%Y'), "time" : (checkin.date-timedelta(hours=3)).time().strftime('%H:%M')})
+
+        return Response(data, status=status.HTTP_200_OK)
 
 class CheckInViewSet(generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView, GenericViewSet):
     
