@@ -13,7 +13,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
     def get_head(self, instance):
         try:
             head = instance.employees.get(head="SIM")
-            return f"{head.name} | id: {head.id}"
+            return f"{head.name}"
         except Employee.DoesNotExist:
             return None
 

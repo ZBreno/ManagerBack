@@ -128,7 +128,7 @@ class EmployeeViewSet(ModelViewSet):
         percent = (checkin.count() / qtd_employee) * 100
 
         print('quanditdade de funcionario', qtd_employee, 'quanditdade de checkin', checkin.count())
-        return Response({'percent' : f'{int(percent)}%'})
+        return Response(int(percent))
 
     @action(methods=['get'], detail=True, url_path='messages')
     def messages(self,request, *args, **kwargs):
@@ -155,10 +155,18 @@ class EmployeeViewSet(ModelViewSet):
                 
         data = []
         for checkin in checks:
-            data.append({"data" : checkin.date.date().strftime('%d/%m/%Y'), "time" : (checkin.date-timedelta(hours=3)).time().strftime('%H:%M')})
+            data.append({"date" : checkin.date.date().strftime('%d/%m/%Y'), "time" : (checkin.date-timedelta(hours=3)).time().strftime('%H:%M')})
 
         return Response(data, status=status.HTTP_200_OK)
 
+    @action(methods=['get'], detail=False, url_path='employee_code/(?P<code>[^/.]+)')
+    def employee_by_code(self, request, *args, **kwargs):
+        try:
+            employee = Employee.objects.get(code=self.kwargs['code'])
+            serializer = EmployeeSerializer(employee)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Employee.DoesNotExist:
+            return Response({"Error": "Employee not found."}, status=status.HTTP_400_BAD_REQUEST)
 class CheckInViewSet(generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView, GenericViewSet):
     
     queryset = CheckIn.objects.all()
@@ -169,7 +177,7 @@ class CheckInViewSet(generics.CreateAPIView, generics.ListAPIView, generics.Retr
     def week(self,request, *args, **kwargs):
         dt = datetime.today()
         week = [dt + timedelta(days=i) for i in range(0 - dt.weekday(), 7 - dt.weekday())]
-
+        dias = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-Feira", "Sábado"]
         results = []
         for day in week:
             number = 0
@@ -177,7 +185,7 @@ class CheckInViewSet(generics.CreateAPIView, generics.ListAPIView, generics.Retr
             for checkin in checkins:
                 if checkin.date.date() == day.date():
                     number += 1
-            results.append(number)
+            results.append({'name': dias[day.weekday()], 'checkIns': number})
 
         return Response(results, status=status.HTTP_200_OK)
    
