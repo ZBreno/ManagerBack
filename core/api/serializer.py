@@ -6,6 +6,7 @@ from users.api.serializer import UserSerializer
 class DepartmentSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     head = serializers.SerializerMethodField()
+    user = UserSerializer(read_only=True, required=False)
     class Meta:
         model = Department
         fields = ['id','name','assignment','contact','location','head','user']
