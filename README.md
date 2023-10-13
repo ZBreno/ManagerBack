@@ -17,7 +17,7 @@ Breno Soares & [Jose Neto](https://github.com/ZzZzNeto)
 
 ## Documentações
 
-- [📄 Requisitos funcionais/não funcionais](https://drive.google.com/file/d/10TakcnNMuTFSYaHr2G582g6qzPmZK34/view?usp=sharing)
+- [📄 Requisitos funcionais/não funcionais](https://drive.google.com/file/d/10Ta_kcnNMuTFSYaHr2G582g6qzPmZK34/view?usp=sharing)
 - [👩🏻‍💻 Casos de uso](https://drive.google.com/file/d/1CJjRd100EArTfbCyiPwp05XBsz39KLBj/view?usp=sharing)
 - [🔗 Diagrama de classes](https://drive.google.com/file/d/10Cvp5g0iA7wh9mp8YT4DNKgFFdNFLGVE/view?usp=sharing)
 - [⚙️ Visão funcional](https://drive.google.com/file/d/1zk8mlfRKxi3XWtymagDZsFrYu00zn3k4/view?usp=sharing)
